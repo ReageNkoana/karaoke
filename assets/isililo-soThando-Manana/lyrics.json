@@ -1,0 +1,15 @@
+{
+  "song": "Isililo soThando",
+  "artist": "Manana ft. Thando Zide",
+  "duration": 79,
+  "lyrics": [
+    { "time": 8.59, "text": "Only love wins" },
+    { "time": 13.58, "text": "Only love wins" },
+    { "time": 18.38, "text": "Only love wins" },
+    { "time": 23.66, "text": "Sonk'iskhathi" },
+    { "time": 25.61, "text": "Sonke" },
+    { "time": 28.62, "text": "Sonk' iskhathi" },
+    { "time": 34.17, "text": "Uthando luhlezi luphumelela" },
+    { "time": 52.98, "text": "Luhlezi luphumelela" }
+  ]
+}
