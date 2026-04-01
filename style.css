@@ -1,0 +1,574 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    font-family: 'Segoe UI', 'Poppins', 'Inter', system-ui, sans-serif;
+    background: #0a0c15;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* ----- FULLSCREEN FLOATING NOTES BACKGROUND ----- */
+.floating-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 30% 10%, #1a1a2e, #0a0a1a);
+    overflow: hidden;
+}
+
+.music-note {
+    position: absolute;
+    font-size: 1.8rem;
+    opacity: 0.25;
+    pointer-events: none;
+    animation: floatUpSlow linear forwards;
+    color: #ffd966;
+    text-shadow: 0 0 5px rgba(255,217,102,0.5);
+    z-index: 1;
+}
+
+@keyframes floatUpSlow {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0.3; }
+    100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
+}
+
+/* JAZZ CLUB LIGHTS - RED, GREEN, BLUE, YELLOW SPOTLIGHTS */
+.jazz-lights {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
+.light-beam {
+    position: absolute;
+    top: -10%;
+    width: 80px;
+    height: 120%;
+    background: linear-gradient(180deg, rgba(255,0,0,0.4) 0%, rgba(255,0,0,0) 70%);
+    transform: skewX(-15deg);
+    animation: swingLight 8s ease-in-out infinite;
+}
+
+.light-beam:nth-child(1) { left: 5%; background: linear-gradient(180deg, rgba(255,50,50,0.5) 0%, rgba(255,0,0,0) 70%); animation-delay: 0s; width: 100px; }
+.light-beam:nth-child(2) { left: 25%; background: linear-gradient(180deg, rgba(50,255,50,0.45) 0%, rgba(0,255,0,0) 70%); animation-delay: 1.2s; width: 120px; }
+.light-beam:nth-child(3) { left: 45%; background: linear-gradient(180deg, rgba(50,100,255,0.5) 0%, rgba(0,0,255,0) 70%); animation-delay: 2.5s; width: 90px; }
+.light-beam:nth-child(4) { left: 65%; background: linear-gradient(180deg, rgba(255,220,50,0.55) 0%, rgba(255,200,0,0) 70%); animation-delay: 3.8s; width: 110px; }
+.light-beam:nth-child(5) { left: 85%; background: linear-gradient(180deg, rgba(255,100,200,0.45) 0%, rgba(255,0,150,0) 70%); animation-delay: 5s; width: 85px; }
+
+@keyframes swingLight {
+    0%, 100% { transform: skewX(-15deg) translateX(-20px); opacity: 0.7; }
+    50% { transform: skewX(5deg) translateX(30px); opacity: 1; }
+}
+
+.moving-spot {
+    position: absolute;
+    top: 0;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    filter: blur(50px);
+    animation: moveSpot 12s infinite alternate;
+}
+
+.moving-spot:nth-child(6) { background: rgba(255,80,80,0.3); left: 10%; animation-duration: 14s; }
+.moving-spot:nth-child(7) { background: rgba(80,255,80,0.3); right: 10%; animation-duration: 10s; animation-delay: -3s; }
+
+@keyframes moveSpot {
+    0% { transform: translateY(0) translateX(0); }
+    100% { transform: translateY(60vh) translateX(100px); }
+}
+
+/* GLOBAL TRANSITION */
+.screen-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, #ffb347, #ff6b6b, #1a0b2e);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    mix-blend-mode: screen;
+}
+
+/* main picker stage (card carousel) */
+.picker-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(145deg, #11131f 0%, #07090f 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.6s ease;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10;
+    scroll-behavior: smooth;
+}
+
+.picker-stage::-webkit-scrollbar {
+    width: 6px;
+}
+.picker-stage::-webkit-scrollbar-track {
+    background: rgba(255,255,200,0.1);
+    border-radius: 10px;
+}
+.picker-stage::-webkit-scrollbar-thumb {
+    background: #ffd966;
+    border-radius: 10px;
+}
+
+.carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1200px;
+    margin: 1rem 0;
+    flex-shrink: 0;
+    cursor: grab;
+}
+
+.carousel-container:active {
+    cursor: grabbing;
+}
+
+.scroll-spacer {
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.song-card {
+    position: absolute;
+    width: 320px;
+    background: rgba(22, 26, 40, 0.95);
+    backdrop-filter: blur(16px);
+    border-radius: 48px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 2px rgba(255,200,100,0.2);
+    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    cursor: pointer;
+    border: 1px solid rgba(255,215,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.song-card.active-center {
+    transform: translateX(0px) scale(1);
+    opacity: 1;
+    z-index: 20;
+    box-shadow: 0 30px 50px rgba(0,0,0,0.6), 0 0 0 3px #ffd966;
+}
+
+.song-card.next-card {
+    transform: translateX(110%) scale(0.85);
+    opacity: 0.5;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.song-card.prev-card {
+    transform: translateX(-110%) scale(0.85);
+    opacity: 0.5;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.song-cover {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 60px;
+    background: linear-gradient(135deg, #2a2f4b, #1a1e2f);
+}
+
+.song-title { font-size: 1.5rem; font-weight: 800; color: white; margin: 0.8rem 0 0.4rem; text-shadow: 0 2px 5px black; }
+.song-artist { color: #ffd966; font-weight: 500; margin-bottom: 0.5rem; font-size: 0.85rem; }
+.swipe-hint { color: rgba(255,255,200,0.7); font-size: 0.8rem; margin-top: 1rem; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.instruction { margin: 1rem 0 2rem 0; color: #aaa; font-size: 0.8rem; background: rgba(0,0,0,0.4); padding: 0.5rem 1rem; border-radius: 40px; flex-shrink: 0; }
+
+/* KARAOKE SCREEN - BACKGROUND REMOVED (TRANSPARENT) */
+.karaoke-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.8s ease;
+    font-family: 'Segoe UI', system-ui;
+}
+
+.karaoke-screen.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.lyrics-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+    overflow: hidden;
+    background: transparent !important;
+}
+
+/* Lyrics container with smooth transitions */
+.lyrics-slide-container {
+    width: 100%;
+    max-width: 800px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 450px;
+    height: auto;
+    background: transparent !important;
+}
+
+/* Base lyric item style */
+.lyric-slide-item {
+    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    will-change: transform, opacity, filter;
+    transition: none !important;
+}
+
+/* --- CURRENT LYRIC: Perfectly centered --- */
+.lyric-slide-item.current {
+    font-size: 2.3rem;
+    font-weight: bold;
+    color: #ffec99;
+    text-shadow: 0 0 28px #ff9f4a, 0 0 12px rgba(255,100,0,0.8);
+    background: rgba(0, 0, 0, 0.65);
+    padding: 1rem 2rem;
+    border-radius: 80px;
+    backdrop-filter: blur(20px);
+    margin: 0.5rem 0;
+    opacity: 1;
+    letter-spacing: 0.5px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 10;
+}
+
+/* --- NEXT 1: Positioned below current --- */
+.lyric-slide-item.next-1 {
+    font-size: 1.5rem;
+    opacity: 0.75;
+    text-shadow: 0 0 8px rgba(255, 200, 100, 0.3);
+    color: #f0e6c5;
+    margin-top: 0.25rem;
+    position: relative;
+}
+
+/* --- NEXT 2: Even further below --- */
+.lyric-slide-item.next-2 {
+    font-size: 1.2rem;
+    opacity: 0.55;
+    color: #e0d4b0;
+    margin-top: 0.1rem;
+    position: relative;
+}
+
+/* --- NEXT 3: Farthest below --- */
+.lyric-slide-item.next-3 {
+    font-size: 1rem;
+    opacity: 0.4;
+    color: #cfc49a;
+    position: relative;
+}
+
+/* ===============================
+   FIXED KARAOKE ANIMATIONS
+   =============================== */
+
+/* Current lyric fades out and moves downward */
+@keyframes fadeDownAndOut {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(60px);
+        filter: blur(4px);
+    }
+}
+
+/* New lyric fades in from top */
+@keyframes fadeInFromTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-60px);
+        filter: blur(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* Apply animations to the classes your JavaScript uses */
+.lyric-slide-item.slide-out {
+    animation: fadeDownAndOut 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.lyric-slide-item.slide-in {
+    animation: fadeInFromTop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards !important;
+}
+
+/* Backup animations for other classes just in case */
+.lyric-slide-item.demote-from-current {
+    animation: fadeDownAndOut 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+}
+
+.lyric-slide-item.promote-to-current {
+    animation: fadeInFromTop 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.1) forwards !important;
+}
+
+.lyric-slide-item.appear-from-back {
+    animation: fadeInFromTop 0.6s cubic-bezier(0.2, 0.85, 0.3, 1.05) forwards !important;
+}
+
+/* KARAOKE CONTROLS - MODERN DESIGN */
+.karaoke-controls {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid rgba(255, 215, 0, 0.3);
+    z-index: 20;
+}
+
+.theme-select {
+    background: rgba(255, 180, 71, 0.9);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1a1a2e;
+}
+
+.theme-select:hover {
+    background: #ffb347;
+    transform: scale(1.02);
+}
+
+.player-controls {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.progress-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.time-display {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+    font-family: monospace;
+    min-width: 40px;
+    text-align: center;
+}
+
+.progress-container {
+    flex: 1;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ffb347, #ff6b6b);
+    border-radius: 5px;
+    position: relative;
+    transition: width 0.05s linear;
+}
+
+.progress-container:hover .progress-bar::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: #ffb347;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ffb347;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.control-btn {
+    background: rgba(255, 180, 71, 0.9);
+    border: none;
+    padding: 8px 24px;
+    border-radius: 40px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.control-btn:hover {
+    transform: scale(1.05);
+    background: #ffb347;
+}
+
+.control-btn:active {
+    transform: scale(0.98);
+}
+
+.exit-btn {
+    background: rgba(51, 51, 51, 0.9);
+    color: white;
+}
+
+.exit-btn:hover {
+    background: #444;
+}
+
+.play-btn {
+    min-width: 70px;
+    font-size: 1.2rem;
+}
+
+.song-title-header {
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.4rem;
+    font-weight: bold;
+    background: linear-gradient(90deg, #ffb347, #ff6b6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    z-index: 10;
+    position: relative;
+}
+
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,215,0,0.5);
+    transform: scale(0);
+    animation: rippleAnim 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes rippleAnim { to { transform: scale(6); opacity: 0; } }
+
+/* VIDEO BACKGROUND */
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* DARK OVERLAY - REMOVED, now transparent */
+.video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: transparent !important;
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 550px) {
+    .song-card { width: 280px; padding: 1.2rem; }
+    .carousel-container { height: 440px; max-width: 100%; }
+    .lyric-slide-item.current { font-size: 1.5rem; padding: 0.7rem 1.2rem; }
+    .lyric-slide-item.next-1 { font-size: 1.1rem; }
+    .lyric-slide-item.next-2 { font-size: 0.9rem; }
+    .lyric-slide-item.next-3 { font-size: 0.75rem; }
+    .karaoke-controls { padding: 0.6rem 1rem; }
+    .control-btn { padding: 6px 18px; font-size: 0.9rem; }
+    .theme-select { padding: 6px 12px; font-size: 0.75rem; }
+    
+    @keyframes fadeDownAndOut {
+        0% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        100% { opacity: 0; transform: translateY(40px); filter: blur(3px); }
+    }
+    
+    @keyframes fadeInFromTop {
+        0% { opacity: 0; transform: translateY(-40px); filter: blur(3px); }
+        100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+}
